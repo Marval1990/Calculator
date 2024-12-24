@@ -2,13 +2,17 @@
 <html>
 <head>
     <title>Revenue Calculator</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+    <!-- Make sure we use HTTPS for the Chart.js library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js" integrity="sha512-TW5s0IT/IppJtu76UbysrBH9Hy/5X41OTAbQuffZFU6lQ1rdcLHzpU5BzVvr/YFykoiMYZVWlr/PX1mDcfM9Qg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
         body {
             font-family: Arial, sans-serif;
             max-width: 800px;
             margin: 20px auto;
             padding: 20px;
+            background-color: #f5f5f5;
         }
         .container {
             background: white;
@@ -45,6 +49,9 @@
         .chart-container {
             margin: 20px 0;
             height: 400px;
+            background: white;
+            padding: 10px;
+            border-radius: 4px;
         }
     </style>
 </head>
@@ -73,149 +80,151 @@
     </div>
 
     <script>
-        let myChart = null;
+        // Wait for the page to fully load
+        window.addEventListener('load', function() {
+            let myChart = null;
 
-        function formatNOK(value) {
-            return new Intl.NumberFormat('no-NO', {
-                style: 'currency',
-                currency: 'NOK',
-                maximumFractionDigits: 0
-            }).format(value);
-        }
-
-        function updateCalculator() {
-            const clinicRevenue = parseFloat(document.getElementById('clinicRevenue').value);
-            const provisionRate = parseFloat(document.getElementById('provisionRate').value);
-            
-            if (isNaN(clinicRevenue) || isNaN(provisionRate)) return;
-            
-            const earnings = (clinicRevenue * provisionRate) / 100;
-            
-            // Update results text
-            document.getElementById('earningsText').innerHTML = `
-                <p>With revenue of ${formatNOK(clinicRevenue)} and ${provisionRate}% provision rate:</p>
-                <p class="earnings">Result: ${formatNOK(earnings)}</p>
-            `;
-            
-                    // Generate data points with 50,000 NOK intervals
-            const step = 50000;
-            const maxRevenue = Math.max(400000, Math.ceil(clinicRevenue * 2 / step) * step); // Minimum 400,000 NOK for scale
-            const dataPoints = [];
-            
-            for (let revenue = 0; revenue <= maxRevenue; revenue += step) {
-                dataPoints.push({
-                    x: revenue,
-                    y: (revenue * provisionRate) / 100
-                });
+            function formatNOK(value) {
+                return new Intl.NumberFormat('no-NO', {
+                    style: 'currency',
+                    currency: 'NOK',
+                    maximumFractionDigits: 0
+                }).format(value);
             }
 
-            // Calculate suggested ticks for y-axis
-            const maxY = (maxRevenue * provisionRate) / 100;
-            const yStep = 20000;
-            const yTicks = [];
-            for (let y = 0; y <= maxY; y += yStep) {
-                yTicks.push(y);
-            }
-            
-            // Update chart
-            if (myChart) {
-                myChart.destroy();
-            }
-            
-            const ctx = document.getElementById('earningsChart').getContext('2d');
-            myChart = new Chart(ctx, {
-                type: 'scatter',
-                data: {
-                    datasets: [{
-                        label: 'Result',
-                        data: dataPoints,
-                        borderColor: '#2563eb',
-                        backgroundColor: 'rgba(37, 99, 235, 0.1)',
-                        fill: true,
-                        tension: 0.1,
-                        pointRadius: 4,
-                        pointHoverRadius: 6,
-                        showLine: true
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    interaction: {
-                        intersect: false,
-                        mode: 'index'
+            function updateCalculator() {
+                const clinicRevenue = parseFloat(document.getElementById('clinicRevenue').value) || 0;
+                const provisionRate = parseFloat(document.getElementById('provisionRate').value) || 0;
+                
+                const earnings = (clinicRevenue * provisionRate) / 100;
+                
+                // Update results text
+                document.getElementById('earningsText').innerHTML = `
+                    <p>With revenue of ${formatNOK(clinicRevenue)} and ${provisionRate}% provision rate:</p>
+                    <p class="earnings">Result: ${formatNOK(earnings)}</p>
+                `;
+                
+                // Generate data points with 50,000 NOK intervals
+                const step = 50000;
+                const maxRevenue = Math.max(400000, Math.ceil(clinicRevenue * 2 / step) * step);
+                const dataPoints = [];
+                
+                for (let revenue = 0; revenue <= maxRevenue; revenue += step) {
+                    dataPoints.push({
+                        x: revenue,
+                        y: (revenue * provisionRate) / 100
+                    });
+                }
+
+                // Calculate suggested ticks for y-axis
+                const maxY = (maxRevenue * provisionRate) / 100;
+                const yStep = 20000;
+                const yTicks = [];
+                for (let y = 0; y <= maxY; y += yStep) {
+                    yTicks.push(y);
+                }
+                
+                // Destroy existing chart if it exists
+                if (myChart) {
+                    myChart.destroy();
+                }
+                
+                // Create new chart
+                const ctx = document.getElementById('earningsChart').getContext('2d');
+                myChart = new Chart(ctx, {
+                    type: 'scatter',
+                    data: {
+                        datasets: [{
+                            label: 'Result',
+                            data: dataPoints,
+                            borderColor: '#2563eb',
+                            backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                            fill: true,
+                            tension: 0.1,
+                            pointRadius: 4,
+                            pointHoverRadius: 6,
+                            showLine: true
+                        }]
                     },
-                    scales: {
-                        x: {
-                            type: 'linear',
-                            title: {
-                                display: true,
-                                text: 'Revenue (NOK)',
-                                font: {
-                                    size: 14,
-                                    weight: 'bold'
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        interaction: {
+                            intersect: false,
+                            mode: 'index'
+                        },
+                        scales: {
+                            x: {
+                                type: 'linear',
+                                title: {
+                                    display: true,
+                                    text: 'Revenue (NOK)',
+                                    font: {
+                                        size: 14,
+                                        weight: 'bold'
+                                    }
+                                },
+                                ticks: {
+                                    callback: function(value) {
+                                        return formatNOK(value);
+                                    },
+                                    stepSize: 50000,
+                                    autoSkip: false
+                                },
+                                min: 0,
+                                max: maxRevenue,
+                                grid: {
+                                    display: true
                                 }
                             },
-                            ticks: {
-                                callback: function(value) {
-                                    return formatNOK(value);
+                            y: {
+                                type: 'linear',
+                                title: {
+                                    display: true,
+                                    text: 'Result (NOK)',
+                                    font: {
+                                        size: 14,
+                                        weight: 'bold'
+                                    }
                                 },
-                                stepSize: 50000,
-                                autoSkip: false
-                            },
-                            min: 0,
-                            max: maxRevenue,
-                            grid: {
-                                display: true
+                                ticks: {
+                                    callback: function(value) {
+                                        return formatNOK(value);
+                                    },
+                                    stepSize: 20000,
+                                    autoSkip: false,
+                                    values: yTicks
+                                },
+                                min: 0,
+                                max: maxY,
+                                grid: {
+                                    display: true
+                                }
                             }
                         },
-                        y: {
-                            type: 'linear',
-                            title: {
-                                display: true,
-                                text: 'Result (NOK)',
-                                font: {
-                                    size: 14,
-                                    weight: 'bold'
-                                }
-                            },
-                            ticks: {
-                                callback: function(value) {
-                                    return formatNOK(value);
-                                },
-                                stepSize: 20000,
-                                autoSkip: false,
-                                values: yTicks
-                            },
-                            min: 0,
-                            max: maxY,
-                            grid: {
-                                display: true
-                            }
-                        }
-                    },
-                    plugins: {
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    return 'Result: ' + formatNOK(context.raw.y);
-                                },
-                                title: function(context) {
-                                    return 'Revenue: ' + formatNOK(context[0].raw.x);
+                        plugins: {
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return 'Result: ' + formatNOK(context.raw.y);
+                                    },
+                                    title: function(context) {
+                                        return 'Revenue: ' + formatNOK(context[0].raw.x);
+                                    }
                                 }
                             }
                         }
                     }
-                }
-            });
-        }
+                });
+            }
 
-        // Add event listeners
-        document.getElementById('clinicRevenue').addEventListener('input', updateCalculator);
-        document.getElementById('provisionRate').addEventListener('input', updateCalculator);
-        
-        // Initial calculation
-        updateCalculator();
+            // Add event listeners
+            document.getElementById('clinicRevenue').addEventListener('input', updateCalculator);
+            document.getElementById('provisionRate').addEventListener('input', updateCalculator);
+            
+            // Initial calculation
+            updateCalculator();
+        });
     </script>
 </body>
 </html>
