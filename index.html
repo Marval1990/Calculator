@@ -8,18 +8,19 @@
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..125,400..900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --pitch-0:#08130d;      /* deepest night green */
-    --pitch-1:#0d1e14;      /* card background */
-    --pitch-2:#14291c;      /* card raised */
-    --line:#23402f;         /* connector lines */
-    --grass:#2f8f5b;        /* winner green */
-    --chalk:#e9f2ec;        /* primary text */
-    --chalk-dim:#7d9487;    /* secondary text */
-    --gold:#e8b33c;         /* the trophy / final */
-    --live:#ff4d4d;         /* live red */
-    --norge:#d94355;        /* Norway path highlight */
+    --pitch-0:#08130d;
+    --pitch-1:#0d1e14;
+    --pitch-2:#14291c;
+    --line:#23402f;
+    --grass:#2f8f5b;
+    --chalk:#e9f2ec;
+    --chalk-dim:#7d9487;
+    --gold:#e8b33c;
+    --live:#ff4d4d;
+    --norge:#d94355;
   }
   *{margin:0;padding:0;box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
   body{
     background:
       radial-gradient(1200px 600px at 50% -10%, #12301e 0%, transparent 60%),
@@ -28,34 +29,20 @@
     font-family:'Inter',system-ui,sans-serif;
     min-height:100vh;
   }
-  header{
-    text-align:center;
-    padding:28px 16px 10px;
-  }
+  header{text-align:center;padding:24px 16px 8px}
   .eyebrow{
-    font-family:'Archivo',sans-serif;
-    font-stretch:112%;
-    font-weight:600;
-    font-size:11px;
-    letter-spacing:.32em;
-    text-transform:uppercase;
-    color:var(--chalk-dim);
+    font-family:'Archivo',sans-serif;font-stretch:112%;font-weight:600;
+    font-size:10px;letter-spacing:.3em;text-transform:uppercase;color:var(--chalk-dim);
   }
   h1{
-    font-family:'Archivo',sans-serif;
-    font-stretch:120%;
-    font-weight:900;
-    font-size:clamp(26px,5vw,44px);
-    letter-spacing:-.01em;
-    margin-top:6px;
+    font-family:'Archivo',sans-serif;font-stretch:120%;font-weight:900;
+    font-size:clamp(24px,5vw,44px);letter-spacing:-.01em;margin-top:6px;
   }
   h1 .yr{color:var(--gold)}
-  .updated{
-    font-size:12px;color:var(--chalk-dim);margin-top:8px;
-  }
+  .updated{font-size:12px;color:var(--chalk-dim);margin-top:8px}
   .legend{
-    display:flex;flex-wrap:wrap;gap:14px;justify-content:center;
-    margin:14px auto 4px;font-size:12px;color:var(--chalk-dim);
+    display:flex;flex-wrap:wrap;gap:12px;justify-content:center;
+    margin:12px auto 4px;font-size:11.5px;color:var(--chalk-dim);
   }
   .legend span{display:flex;align-items:center;gap:6px}
   .dot{width:8px;height:8px;border-radius:50%}
@@ -64,55 +51,34 @@
   .dot.u{background:var(--chalk-dim)}
   .dot.n{background:var(--norge)}
   @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
-
-  /* ---------- bracket scaffold ---------- */
-  .scroller{
-    overflow-x:auto;
-    padding:20px 12px 40px;
-    -webkit-overflow-scrolling:touch;
-  }
-  .bracket{
-    display:grid;
-    grid-template-columns:repeat(9, 172px);
-    gap:0 18px;
-    min-width:1720px;
-    margin:0 auto;
-    max-width:1900px;
-  }
-  .col{display:flex;flex-direction:column;justify-content:space-around;gap:14px}
-  .round-label{
-    font-family:'Archivo',sans-serif;font-stretch:112%;
-    font-size:10px;font-weight:700;letter-spacing:.22em;
-    text-transform:uppercase;color:var(--chalk-dim);
-    text-align:center;margin-bottom:6px;
-    position:sticky;top:0;
+  @media (prefers-reduced-motion: reduce){
+    .dot.l,.badge-live::before{animation:none}
+    .sheet{transition:none}
   }
 
-  /* ---------- match card ---------- */
+  /* ---------- kampkort ---------- */
   .match{
     background:var(--pitch-1);
     border:1px solid var(--line);
     border-radius:10px;
-    padding:8px 10px;
+    padding:9px 11px;
     position:relative;
+    cursor:pointer;
+    -webkit-tap-highlight-color:transparent;
   }
+  .match:active{background:var(--pitch-2)}
+  @media (hover:hover){ .match:hover{border-color:#3a5c46;background:var(--pitch-2)} }
   .match.norge{border-color:var(--norge);box-shadow:0 0 0 1px var(--norge),0 0 18px -6px var(--norge)}
   .match .meta{
     display:flex;justify-content:space-between;align-items:center;
-    font-size:10.5px;color:var(--chalk-dim);margin-bottom:5px;
-    letter-spacing:.04em;
+    font-size:10.5px;color:var(--chalk-dim);margin-bottom:5px;letter-spacing:.04em;
   }
-  .badge-live{
-    color:var(--live);font-weight:700;display:flex;align-items:center;gap:5px;
-  }
+  .badge-live{color:var(--live);font-weight:700;display:flex;align-items:center;gap:5px}
   .badge-live::before{
     content:"";width:7px;height:7px;border-radius:50%;
     background:var(--live);animation:pulse 1.2s infinite;
   }
-  .team{
-    display:flex;align-items:center;gap:7px;
-    padding:3px 0;font-size:13.5px;font-weight:500;
-  }
+  .team{display:flex;align-items:center;gap:7px;padding:3px 0;font-size:13.5px;font-weight:500}
   .team .flag{font-size:16px;width:20px;text-align:center;flex:none}
   .team .name{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .team .score{
@@ -125,11 +91,25 @@
   .team.loser{opacity:.42}
   .team.loser .name{text-decoration:line-through;text-decoration-color:rgba(233,242,236,.4);text-decoration-thickness:1px}
   .team.tbd{color:var(--chalk-dim);font-style:italic;font-size:12.5px}
-  .pens{
-    font-size:10.5px;color:var(--chalk-dim);margin-top:3px;
+  .pens{font-size:10.5px;color:var(--chalk-dim);margin-top:3px}
+  .chev{
+    position:absolute;right:8px;top:50%;transform:translateY(-50%);
+    color:var(--chalk-dim);font-size:11px;opacity:.55;display:none;
   }
 
-  /* ---------- final card ---------- */
+  /* ---------- desktop: klassisk tre ---------- */
+  .scroller{overflow-x:auto;padding:20px 12px 40px;-webkit-overflow-scrolling:touch}
+  .bracket{
+    display:grid;grid-template-columns:repeat(9, 172px);
+    gap:0 18px;min-width:1720px;margin:0 auto;max-width:1900px;
+  }
+  .col{display:flex;flex-direction:column;justify-content:space-around;gap:14px}
+  .round-label{
+    font-family:'Archivo',sans-serif;font-stretch:112%;
+    font-size:10px;font-weight:700;letter-spacing:.22em;
+    text-transform:uppercase;color:var(--chalk-dim);
+    text-align:center;margin-bottom:6px;
+  }
   .final-wrap{display:flex;flex-direction:column;justify-content:center;align-items:center;gap:10px}
   .trophy{font-size:44px;filter:drop-shadow(0 4px 14px rgba(232,179,60,.45))}
   .final-title{
@@ -142,15 +122,109 @@
     box-shadow:0 0 0 1px rgba(232,179,60,.35), 0 8px 30px -10px rgba(232,179,60,.35);
     width:100%;
   }
+
+  /* ---------- mobil: kompakt tre (hele treet i bredden, som VG) ---------- */
+  .hint2{display:none}
+  @media (max-width:820px){
+    .hint2{display:block;text-align:center;font-size:11px;color:var(--chalk-dim);padding:2px 16px 0}
+    .scroller{padding:10px 5px 26px;overflow-x:hidden}
+    .bracket{min-width:0;max-width:100%;grid-template-columns:repeat(9,minmax(0,1fr));gap:0 3px}
+    .col{gap:9px}
+    .round-label{display:none}
+    .match{padding:4px 2px;border-radius:7px}
+    .match .meta{margin-bottom:2px;font-size:8px;justify-content:center;letter-spacing:0}
+    .match .meta span:first-child:not(.badge-live){display:none}
+    .match .meta .badge-live{position:absolute;top:-4px;right:-3px;font-size:0}
+    .match .meta .dt{white-space:nowrap;overflow:hidden;max-width:100%}
+    .tm2{display:none}
+    .team{gap:2px;padding:1.5px 0;justify-content:center}
+    .team .flag{font-size:13px;width:15px}
+    .team .name{display:none}
+    .team .score{font-size:10.5px;min-width:10px}
+    .team.tbd .flag{color:var(--line)}
+    .pens{display:none}
+    .match.norge{box-shadow:0 0 0 1px var(--norge)}
+    .trophy{font-size:24px}
+    .final-title{font-size:9px;letter-spacing:.04em}
+    .match.final{padding:4px 2px}
+  }
+
+  /* ---------- detaljark / modal ---------- */
+  .overlay{
+    position:fixed;inset:0;background:rgba(3,8,5,.72);
+    backdrop-filter:blur(3px);z-index:20;
+    display:none;align-items:flex-end;justify-content:center;
+  }
+  .overlay.open{display:flex}
+  .sheet{
+    background:var(--pitch-1);
+    border:1px solid var(--line);border-bottom:none;
+    border-radius:18px 18px 0 0;
+    width:100%;max-width:560px;
+    max-height:86vh;overflow-y:auto;
+    padding:18px 18px 30px;
+    transform:translateY(12px);transition:transform .18s ease;
+  }
+  .overlay.open .sheet{transform:translateY(0)}
+  @media (min-width:821px){
+    .overlay{align-items:center}
+    .sheet{border-radius:18px;border-bottom:1px solid var(--line);max-height:80vh}
+  }
+  .sheet .closebar{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+  .sheet .roundtag{
+    font-family:'Archivo',sans-serif;font-stretch:112%;font-weight:700;
+    font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--chalk-dim);
+  }
+  .xbtn{
+    background:var(--pitch-2);border:1px solid var(--line);color:var(--chalk);
+    width:32px;height:32px;border-radius:50%;font-size:15px;cursor:pointer;line-height:1;
+  }
+  .scorehead{
+    display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;
+    text-align:center;margin-bottom:6px;
+  }
+  .scorehead .tm .flag{font-size:34px;display:block;margin-bottom:4px}
+  .scorehead .tm .nm{font-size:13px;font-weight:600}
+  .scorehead .tm.out{opacity:.45}
+  .bigscore{
+    font-family:'Archivo',sans-serif;font-stretch:115%;font-weight:900;
+    font-size:34px;letter-spacing:.02em;
+  }
+  .bigscore small{display:block;font-size:11px;font-weight:600;color:var(--chalk-dim);letter-spacing:.05em;margin-top:2px}
+  .statusline{
+    text-align:center;font-size:12px;color:var(--chalk-dim);margin-bottom:14px;
+  }
+  .statusline .badge-live{justify-content:center}
+  .sheet h4{
+    font-family:'Archivo',sans-serif;font-stretch:112%;font-size:11px;font-weight:700;
+    letter-spacing:.18em;text-transform:uppercase;color:var(--chalk-dim);
+    margin:18px 0 8px;border-top:1px solid var(--line);padding-top:14px;
+  }
+  .goalrow{
+    display:grid;grid-template-columns:1fr 44px 1fr;
+    font-size:13px;padding:3px 0;align-items:center;
+  }
+  .goalrow .min{text-align:center;color:var(--chalk-dim);font-size:11.5px;font-weight:600}
+  .goalrow .l{text-align:right}
+  .goalrow .r{text-align:left}
+  .goalrow .icon{font-size:12px;margin:0 4px}
+  .statrow{display:grid;grid-template-columns:52px 1fr 52px;gap:8px;align-items:center;padding:5px 0;font-size:12.5px}
+  .statrow .v{font-weight:700;font-family:'Archivo',sans-serif;font-stretch:110%}
+  .statrow .v.l{text-align:left}
+  .statrow .v.r{text-align:right}
+  .statrow .barwrap{text-align:center}
+  .statrow .lbl{font-size:10.5px;color:var(--chalk-dim);letter-spacing:.05em;text-transform:uppercase;margin-bottom:3px}
+  .bar{display:flex;height:5px;border-radius:3px;overflow:hidden;background:var(--pitch-2)}
+  .bar i{display:block;height:100%}
+  .bar .bh{background:var(--grass)}
+  .bar .ba{background:#4a6a78}
+  .infoline{font-size:12.5px;color:var(--chalk-dim);padding:2px 0;display:flex;gap:8px}
+  .infoline b{color:var(--chalk);font-weight:600}
+  .loading{color:var(--chalk-dim);font-size:12.5px;font-style:italic;padding:6px 0}
   footer{
     text-align:center;font-size:11.5px;color:var(--chalk-dim);
     padding:0 16px 34px;line-height:1.6;
   }
-  @media (max-width:700px){
-    .scroller{padding:14px 8px 30px}
-    .hint{display:block;text-align:center;font-size:11px;color:var(--chalk-dim);margin-top:8px}
-  }
-  .hint{display:none}
 </style>
 </head>
 <body>
@@ -161,29 +235,32 @@
   <div class="updated" id="updated"></div>
   <div class="legend">
     <span><i class="dot w"></i> Videre</span>
-    <span><i class="dot u"></i> Kommende kamp</span>
+    <span><i class="dot u"></i> Kommende</span>
     <span><i class="dot l"></i> Live</span>
     <span><i class="dot n"></i> Norges vei</span>
   </div>
-  <div class="hint">← Sveip sidelengs for hele treet →</div>
 </header>
+
+<div class="hint2">Trykk på en kamp for lagnavn og detaljer</div>
 
 <div class="scroller">
   <div class="bracket" id="bracket"></div>
 </div>
 
 <footer>
-  Alle tider er norsk tid. Resultater hentes automatisk fra ESPN hvert minutt.<br>
-  Hvis hentingen feiler, vises de innebygde resultatene i <code>DATA</code>-objektet i stedet.
+  Trykk på en kamp for detaljer. Alle tider er norsk tid.<br>
+  Resultater hentes automatisk fra ESPN hvert minutt – feiler hentingen,
+  vises de innebygde resultatene.
 </footer>
+
+<div class="overlay" id="overlay">
+  <div class="sheet" id="sheet"></div>
+</div>
 
 <script>
 /* =====================================================================
-   ALT DU TRENGER Å OPPDATERE LIGGER HER.
+   INNEBYGDE DATA (fallback). Live-motoren under fletter inn ESPN-data.
    status: "played" | "live" | "upcoming"
-   score: [hjemme, borte]  (etter ev. ekstraomganger)
-   pens:  [hjemme, borte]  eller null
-   Vinnere regnes ut automatisk og settes inn i neste runde.
    ===================================================================== */
 const LAST_UPDATED = "4. juli 2026, kl. 17:00";
 
@@ -207,7 +284,6 @@ const TEAMS = {
 };
 
 const DATA = {
-  /* ---------------- 16-delsfinaler (Round of 32) ---------------- */
   m1:{home:"GER",away:"PAR",date:"29.6.",status:"played",score:[1,1],pens:[3,4]},
   m2:{home:"FRA",away:"SWE",date:"30.6.",status:"played",score:[3,0],pens:null},
   m3:{home:"RSA",away:"CAN",date:"28.6.",status:"played",score:[0,1],pens:null},
@@ -225,32 +301,35 @@ const DATA = {
   m15:{home:"SUI",away:"ALG",date:"3.7.",status:"played",score:[2,0],pens:null},
   m16:{home:"COL",away:"GHA",date:"3.7.",status:"played",score:[1,0],pens:null},
 
-  /* ---------------- Åttedelsfinaler (Round of 16) ----------------
-     home/away: null = hentes automatisk fra kampene i "from"        */
-  r1:{from:["m3","m4"],date:"4.7. kl. 19:00",status:"upcoming",score:null,pens:null},
-  r2:{from:["m1","m2"],date:"4.7. kl. 23:00",status:"upcoming",score:null,pens:null},
-  r3:{from:["m5","m6"],date:"6.7. kl. 21:00",status:"upcoming",score:null,pens:null},
-  r4:{from:["m7","m8"],date:"7.7. kl. 02:00",status:"upcoming",score:null,pens:null},
-  r5:{from:["m9","m10"],date:"5.7. kl. 22:00",status:"upcoming",score:null,pens:null},
-  r6:{from:["m11","m12"],date:"6.7. kl. 02:00",status:"upcoming",score:null,pens:null},
-  r7:{from:["m13","m14"],date:"7.7. kl. 18:00",status:"upcoming",score:null,pens:null},
-  r8:{from:["m15","m16"],date:"7.7. kl. 22:00",status:"upcoming",score:null,pens:null},
+  r1:{from:["m3","m4"],date:"4.7.",time:"19:00",status:"upcoming",score:null,pens:null},
+  r2:{from:["m1","m2"],date:"4.7.",time:"23:00",status:"upcoming",score:null,pens:null},
+  r3:{from:["m5","m6"],date:"6.7.",time:"21:00",status:"upcoming",score:null,pens:null},
+  r4:{from:["m7","m8"],date:"7.7.",time:"02:00",status:"upcoming",score:null,pens:null},
+  r5:{from:["m9","m10"],date:"5.7.",time:"22:00",status:"upcoming",score:null,pens:null},
+  r6:{from:["m11","m12"],date:"6.7.",time:"02:00",status:"upcoming",score:null,pens:null},
+  r7:{from:["m13","m14"],date:"7.7.",time:"18:00",status:"upcoming",score:null,pens:null},
+  r8:{from:["m15","m16"],date:"7.7.",time:"22:00",status:"upcoming",score:null,pens:null},
 
-  /* ---------------- Kvartfinaler ---------------- */
   q1:{from:["r1","r2"],date:"9.7.",status:"upcoming",score:null,pens:null},
   q2:{from:["r3","r4"],date:"10.7.",status:"upcoming",score:null,pens:null},
   q3:{from:["r5","r6"],date:"11.7.",status:"upcoming",score:null,pens:null},
   q4:{from:["r7","r8"],date:"12.7.",status:"upcoming",score:null,pens:null},
 
-  /* ---------------- Semifinaler ---------------- */
   s1:{from:["q1","q2"],date:"14.7.",status:"upcoming",score:null,pens:null},
   s2:{from:["q3","q4"],date:"15.7.",status:"upcoming",score:null,pens:null},
 
-  /* ---------------- Finale ---------------- */
   f1:{from:["s1","s2"],date:"19.7.",status:"upcoming",score:null,pens:null}
 };
 
-/* ===================== motoren – trenger ikke røres ===================== */
+const ROUNDS = [
+  {key:"r32", tab:"16-dels", label:"16-delsfinaler", ids:["m1","m2","m3","m4","m5","m6","m7","m8","m9","m10","m11","m12","m13","m14","m15","m16"]},
+  {key:"r16", tab:"8-dels", label:"Åttedelsfinaler", ids:["r1","r2","r5","r6","r3","r4","r7","r8"]},
+  {key:"qf",  tab:"Kvartfinale", label:"Kvartfinaler", ids:["q1","q2","q3","q4"]},
+  {key:"sf",  tab:"Semifinale", label:"Semifinaler", ids:["s1","s2"]},
+  {key:"f",   tab:"Finale", label:"Finale", ids:["f1"]}
+];
+
+/* ===================== trelogikk ===================== */
 function winnerOf(id){
   const m = DATA[id];
   if(!m || m.status !== "played" || !m.score) return null;
@@ -276,7 +355,16 @@ function placeholder(m, side){
   const nm = c => c ? TEAMS[c].n : "?";
   return "Vinner " + nm(h) + "/" + nm(a);
 }
+const idCache = new Map();
+function getId(m){
+  if(idCache.size === 0) Object.entries(DATA).forEach(([k,v]) => idCache.set(v,k));
+  return idCache.get(m);
+}
+function roundOf(id){
+  return ROUNDS.find(r => r.ids.includes(id));
+}
 
+/* ===================== kortrendering ===================== */
 function teamRow(m, side){
   const code = resolveTeam(m, side);
   const idx = side === "home" ? 0 : 1;
@@ -297,39 +385,35 @@ function teamRow(m, side){
   return `<div class="${cls}"><span class="flag">${t.f}</span><span class="name">${t.n}</span>${scoreHtml}</div>`;
 }
 
-const idCache = new Map();
-function getId(m){
-  if(idCache.size === 0) Object.entries(DATA).forEach(([k,v]) => idCache.set(v,k));
-  return idCache.get(m);
-}
-
 function matchCard(id, isFinal){
   const m = DATA[id];
   const h = resolveTeam(m,"home"), a = resolveTeam(m,"away");
   const hasNorway = h === "NOR" || a === "NOR";
+  const dt = `<span class="dt">${m.date}<em class="tm2" style="font-style:normal">${m.time ? " kl. " + m.time : ""}</em></span>`;
   let meta;
-  if(m.status === "live") meta = `<span class="badge-live">LIVE ${m.clock || ""}</span><span>${m.date}</span>`;
-  else if(m.status === "played") meta = `<span>Sluttresultat</span><span>${m.date}</span>`;
-  else meta = `<span>Kommende</span><span>${m.date}</span>`;
+  if(m.status === "live") meta = `<span class="badge-live">LIVE ${m.clock || ""}</span>${dt}`;
+  else if(m.status === "played") meta = `<span>Sluttresultat</span>${dt}`;
+  else meta = `<span>Kommende</span>${dt}`;
   let extra = "";
   if(m.pens) extra = `<div class="pens">Straffer ${m.pens[0]}–${m.pens[1]}</div>`;
   else if(m.note) extra = `<div class="pens">Avgjort ${m.note}</div>`;
-  return `<div class="match${hasNorway ? " norge":""}${isFinal ? " final":""}">
+  return `<div class="match${hasNorway ? " norge":""}${isFinal ? " final":""}" data-id="${id}" role="button" tabindex="0">
     <div class="meta">${meta}</div>
     ${teamRow(m,"home")}
     ${teamRow(m,"away")}
     ${extra}
+    <span class="chev">›</span>
   </div>`;
 }
 
+/* ===================== desktop-tre ===================== */
 function col(label, ids){
   return `<div class="col"><div>
     <div class="round-label">${label}</div>
     ${ids.map(id => matchCard(id,false)).join("")}
   </div></div>`;
 }
-
-function render(){
+function renderBracket(){
   document.getElementById("bracket").innerHTML =
     col("16-delsfinaler", ["m1","m2","m3","m4","m5","m6","m7","m8"]) +
     col("Åttedelsfinaler", ["r1","r2","r3","r4"]) +
@@ -346,19 +430,157 @@ function render(){
     col("16-delsfinaler", ["m9","m10","m11","m12","m13","m14","m15","m16"]);
 }
 
-render();
-document.getElementById("updated").textContent = "Sist oppdatert: " + LAST_UPDATED;
+function render(){
+  renderBracket();
+}
 
-/* ===================== LIVE-OPPDATERING (ESPN) =====================
-   Henter sluttspillkamper fra ESPNs åpne resultat-API og fletter dem
-   inn i DATA. Kjøres ved lasting og deretter hvert 60. sekund.
-   Feiler hentingen (offline, API endret), beholdes innebygde data.
-   =================================================================== */
+/* ===================== detaljark ===================== */
+const overlay = document.getElementById("overlay");
+const sheet = document.getElementById("sheet");
+const summaryCache = {};
+
+function fmtKickoff(m){
+  if(m.dateIso){
+    const d = new Date(m.dateIso);
+    return d.toLocaleString("no-NO", {weekday:"long", day:"numeric", month:"long",
+      hour:"2-digit", minute:"2-digit"}) + " norsk tid";
+  }
+  return m.date + (m.time ? " kl. " + m.time : "");
+}
+
+function openMatch(id){
+  const m = DATA[id];
+  const h = resolveTeam(m,"home"), a = resolveTeam(m,"away");
+  const round = roundOf(id);
+  const win = m.status === "played" ? winnerOf(id) : null;
+
+  const tmBlock = (code, side) => {
+    if(!code) return `<div class="tm"><span class="flag">·</span><span class="nm" style="color:var(--chalk-dim);font-style:italic">${placeholder(m,side)}</span></div>`;
+    const t = TEAMS[code];
+    const out = win && win !== code ? " out" : "";
+    return `<div class="tm${out}"><span class="flag">${t.f}</span><span class="nm">${t.n}</span></div>`;
+  };
+
+  let scoreLine = "–";
+  let sub = "";
+  if(m.score){
+    scoreLine = `${m.score[0]} – ${m.score[1]}`;
+    if(m.pens) sub = `<small>Straffer ${m.pens[0]}–${m.pens[1]}</small>`;
+    else if(m.note) sub = `<small>Etter ekstraomganger</small>`;
+  }
+
+  let statusLine;
+  if(m.status === "live") statusLine = `<span class="badge-live">LIVE ${m.clock || ""}</span>`;
+  else if(m.status === "played") statusLine = `Slutt · ${fmtKickoff(m)}`;
+  else statusLine = `Avspark: ${fmtKickoff(m)}`;
+
+  let venueHtml = "";
+  if(m.venue) venueHtml += `<div class="infoline">🏟️ <b>${m.venue}</b></div>`;
+  if(m.attendance) venueHtml += `<div class="infoline">👥 <b>${Number(m.attendance).toLocaleString("no-NO")}</b> tilskuere</div>`;
+
+  let goalsHtml = "";
+  if(m.events && m.events.length){
+    goalsHtml = `<h4>Hendelser</h4>` + m.events.map(ev => {
+      const icon = ev.kind === "red" ? "🟥" : (ev.type && ev.type.toLowerCase().includes("own") ? "⚽ (s.m.)" : (ev.type && ev.type.toLowerCase().includes("pen") ? "⚽ (str.)" : "⚽"));
+      const content = `${ev.name} <span class="icon">${icon}</span>`;
+      return `<div class="goalrow">
+        <span class="l">${ev.side === "home" ? content : ""}</span>
+        <span class="min">${ev.min}</span>
+        <span class="r">${ev.side === "away" ? content : ""}</span>
+      </div>`;
+    }).join("");
+  }
+
+  sheet.innerHTML = `
+    <div class="closebar">
+      <span class="roundtag">${round ? round.label : ""}</span>
+      <button class="xbtn" id="closeSheet" aria-label="Lukk">✕</button>
+    </div>
+    <div class="scorehead">
+      ${tmBlock(h,"home")}
+      <div class="bigscore">${scoreLine}${sub}</div>
+      ${tmBlock(a,"away")}
+    </div>
+    <div class="statusline">${statusLine}</div>
+    ${venueHtml}
+    ${goalsHtml}
+    <div id="statsArea">${m.espnId && m.status !== "upcoming" ? `<div class="loading">Henter kampstatistikk …</div>` : ""}</div>
+  `;
+  overlay.classList.add("open");
+  document.getElementById("closeSheet").onclick = closeSheet;
+
+  if(m.espnId && m.status !== "upcoming") loadStats(m);
+}
+function closeSheet(){ overlay.classList.remove("open"); }
+overlay.addEventListener("click", e => { if(e.target === overlay) closeSheet(); });
+document.addEventListener("keydown", e => { if(e.key === "Escape") closeSheet(); });
+
+const STAT_LABELS = {
+  possessionPct:"Ballbesittelse %", totalShots:"Skudd", shotsOnTarget:"Skudd på mål",
+  wonCorners:"Hjørnespark", foulsCommitted:"Forseelser", saves:"Redninger",
+  offsides:"Offside", yellowCards:"Gule kort", redCards:"Røde kort"
+};
+
+async function loadStats(m){
+  const area = document.getElementById("statsArea");
+  try{
+    let data = summaryCache[m.espnId];
+    if(!data){
+      const res = await fetch(`https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/summary?event=${m.espnId}`);
+      if(!res.ok) throw new Error(res.status);
+      data = await res.json();
+      summaryCache[m.espnId] = data;
+    }
+    const teams = data.boxscore && data.boxscore.teams;
+    if(!teams || teams.length !== 2){ area.innerHTML = ""; return; }
+    /* finn hvilken boxscore-side som er "vår" hjemmeside */
+    const hCode = resolveTeam(m,"home");
+    const norm = s => (s||"").toUpperCase();
+    let hi = 0;
+    const abbr0 = norm(teams[0].team && teams[0].team.abbreviation);
+    if(abbr0 !== hCode && !(m.abbrMap && m.abbrMap[abbr0] === hCode)) hi = 1;
+    const ai = hi === 0 ? 1 : 0;
+
+    const getStat = (t, name) => {
+      const s = (t.statistics || []).find(x => x.name === name);
+      return s ? s.displayValue : null;
+    };
+    let rows = "";
+    for(const [name,label] of Object.entries(STAT_LABELS)){
+      const hv = getStat(teams[hi], name), av = getStat(teams[ai], name);
+      if(hv == null && av == null) continue;
+      const hn = parseFloat(hv) || 0, an = parseFloat(av) || 0;
+      const tot = hn + an || 1;
+      rows += `<div class="statrow">
+        <span class="v l">${hv ?? "–"}</span>
+        <span class="barwrap"><span class="lbl">${label}</span>
+          <span class="bar"><i class="bh" style="width:${(hn/tot*100).toFixed(1)}%"></i><i class="ba" style="width:${(an/tot*100).toFixed(1)}%"></i></span>
+        </span>
+        <span class="v r">${av ?? "–"}</span>
+      </div>`;
+    }
+    area.innerHTML = rows ? `<h4>Kampstatistikk</h4>${rows}` : "";
+  }catch(e){
+    area.innerHTML = "";
+  }
+}
+
+/* klikk/tastatur på kampkort */
+document.addEventListener("click", e => {
+  const card = e.target.closest(".match[data-id]");
+  if(card) openMatch(card.dataset.id);
+});
+document.addEventListener("keydown", e => {
+  if(e.key === "Enter" || e.key === " "){
+    const card = e.target.closest && e.target.closest(".match[data-id]");
+    if(card){ e.preventDefault(); openMatch(card.dataset.id); }
+  }
+});
+
+/* ===================== LIVE-OPPDATERING (ESPN) ===================== */
 const ESPN_URL = "https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard?dates=20260628-20260719&limit=200";
-
-/* ESPN bruker stort sett FIFA-koder, men noen varianter forekommer */
 const ABBR_ALIAS = { NLD:"NED", HOL:"NED", CGO:"COD", CBV:"CPV", CVI:"CPV",
-                     SAF:"RSA", IVC:"CIV", BOS:"BIH", SWI:"SUI", ALGE:"ALG" };
+                     SAF:"RSA", IVC:"CIV", BOS:"BIH", SWI:"SUI" };
 const normAbbr = s => { s = (s||"").toUpperCase(); return ABBR_ALIAS[s] || s; };
 
 async function syncLive(){
@@ -373,7 +595,6 @@ async function syncLive(){
       const cs = comp.competitors;
       const codes = cs.map(x => normAbbr(x.team && x.team.abbreviation));
 
-      /* finn kampen i DATA med samme lagpar (rekkefølge-uavhengig) */
       for(const [id, m] of Object.entries(DATA)){
         const h = resolveTeam(m,"home"), a = resolveTeam(m,"away");
         if(!h || !a) continue;
@@ -381,16 +602,38 @@ async function syncLive(){
                          (codes[0] === a && codes[1] === h);
         if(!samePair) continue;
 
-        const state = ev.status && ev.status.type && ev.status.type.state; // pre | in | post
+        const hc = cs.find(x => normAbbr(x.team.abbreviation) === h);
+        const ac = cs.find(x => normAbbr(x.team.abbreviation) === a);
+        m.espnId = ev.id;
+        m.dateIso = ev.date;
+        m.abbrMap = { [ (hc.team.abbreviation||"").toUpperCase() ]: h };
+        if(comp.venue) m.venue = (comp.venue.fullName || "") +
+          (comp.venue.address && comp.venue.address.city ? ", " + comp.venue.address.city : "");
+        if(comp.attendance) m.attendance = comp.attendance;
+
+        const state = ev.status && ev.status.type && ev.status.type.state;
         if(state === "in" || state === "post"){
-          const hc = cs.find(x => normAbbr(x.team.abbreviation) === h);
-          const ac = cs.find(x => normAbbr(x.team.abbreviation) === a);
           m.score = [ +hc.score || 0, +ac.score || 0 ];
           if(hc.shootoutScore != null || ac.shootoutScore != null){
             m.pens = [ +hc.shootoutScore || 0, +ac.shootoutScore || 0 ];
           }
           m.status = state === "in" ? "live" : "played";
           m.clock  = state === "in" ? (ev.status.displayClock || "") : null;
+        }
+
+        /* hendelser: mål og røde kort */
+        if(comp.details && comp.details.length){
+          const hId = hc.team.id;
+          m.events = comp.details
+            .filter(d => d.scoringPlay || d.redCard)
+            .map(d => ({
+              kind: d.redCard ? "red" : "goal",
+              type: d.type && d.type.text || "",
+              min: d.clock && d.clock.displayValue || "",
+              name: (d.athletesInvolved && d.athletesInvolved[0] &&
+                     d.athletesInvolved[0].displayName) || "",
+              side: d.team && String(d.team.id) === String(hId) ? "home" : "away"
+            }));
         }
         break;
       }
@@ -401,16 +644,16 @@ async function syncLive(){
       "Sist oppdatert: " + new Date().toLocaleTimeString("no-NO",
         {hour:"2-digit", minute:"2-digit"}) + " · live fra ESPN";
   }catch(e){
-    /* stille fallback – innebygde resultater vises fortsatt */
     console.warn("Live-oppdatering feilet:", e);
   }
 }
 
+/* ===================== oppstart ===================== */
+render();
+document.getElementById("updated").textContent = "Sist oppdatert: " + LAST_UPDATED;
 syncLive();
 setInterval(syncLive, 60000);
-document.addEventListener("visibilitychange", () => {
-  if(!document.hidden) syncLive();
-});
+document.addEventListener("visibilitychange", () => { if(!document.hidden) syncLive(); });
 </script>
 </body>
 </html>
