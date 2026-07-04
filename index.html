@@ -1,230 +1,416 @@
 <!DOCTYPE html>
-<html>
+<html lang="no">
 <head>
-    <title>Revenue Calculator</title>
-    <!-- Make sure we use HTTPS for the Chart.js library -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js" integrity="sha512-TW5s0IT/IppJtu76UbysrBH9Hy/5X41OTAbQuffZFU6lQ1rdcLHzpU5BzVvr/YFykoiMYZVWlr/PX1mDcfM9Qg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 800px;
-            margin: 20px auto;
-            padding: 20px;
-            background-color: #f5f5f5;
-        }
-        .container {
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        .input-group {
-            margin-bottom: 20px;
-        }
-        .input-group label {
-            display: inline-block;
-            width: 150px;
-            margin-right: 10px;
-        }
-        input {
-            padding: 8px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            width: 120px;
-        }
-        #results {
-            margin: 20px 0;
-            padding: 20px;
-            background: #f0f7ff;
-            border-radius: 4px;
-        }
-        .earnings {
-            font-size: 24px;
-            color: #2563eb;
-            font-weight: bold;
-            margin: 10px 0;
-        }
-        .chart-container {
-            margin: 20px 0;
-            height: 400px;
-            background: white;
-            padding: 10px;
-            border-radius: 4px;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VM 2026 – Sluttspilltreet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..125,400..900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --pitch-0:#08130d;      /* deepest night green */
+    --pitch-1:#0d1e14;      /* card background */
+    --pitch-2:#14291c;      /* card raised */
+    --line:#23402f;         /* connector lines */
+    --grass:#2f8f5b;        /* winner green */
+    --chalk:#e9f2ec;        /* primary text */
+    --chalk-dim:#7d9487;    /* secondary text */
+    --gold:#e8b33c;         /* the trophy / final */
+    --live:#ff4d4d;         /* live red */
+    --norge:#d94355;        /* Norway path highlight */
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{
+    background:
+      radial-gradient(1200px 600px at 50% -10%, #12301e 0%, transparent 60%),
+      var(--pitch-0);
+    color:var(--chalk);
+    font-family:'Inter',system-ui,sans-serif;
+    min-height:100vh;
+  }
+  header{
+    text-align:center;
+    padding:28px 16px 10px;
+  }
+  .eyebrow{
+    font-family:'Archivo',sans-serif;
+    font-stretch:112%;
+    font-weight:600;
+    font-size:11px;
+    letter-spacing:.32em;
+    text-transform:uppercase;
+    color:var(--chalk-dim);
+  }
+  h1{
+    font-family:'Archivo',sans-serif;
+    font-stretch:120%;
+    font-weight:900;
+    font-size:clamp(26px,5vw,44px);
+    letter-spacing:-.01em;
+    margin-top:6px;
+  }
+  h1 .yr{color:var(--gold)}
+  .updated{
+    font-size:12px;color:var(--chalk-dim);margin-top:8px;
+  }
+  .legend{
+    display:flex;flex-wrap:wrap;gap:14px;justify-content:center;
+    margin:14px auto 4px;font-size:12px;color:var(--chalk-dim);
+  }
+  .legend span{display:flex;align-items:center;gap:6px}
+  .dot{width:8px;height:8px;border-radius:50%}
+  .dot.w{background:var(--grass)}
+  .dot.l{background:var(--live);animation:pulse 1.2s infinite}
+  .dot.u{background:var(--chalk-dim)}
+  .dot.n{background:var(--norge)}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+  /* ---------- bracket scaffold ---------- */
+  .scroller{
+    overflow-x:auto;
+    padding:20px 12px 40px;
+    -webkit-overflow-scrolling:touch;
+  }
+  .bracket{
+    display:grid;
+    grid-template-columns:repeat(9, 172px);
+    gap:0 18px;
+    min-width:1720px;
+    margin:0 auto;
+    max-width:1900px;
+  }
+  .col{display:flex;flex-direction:column;justify-content:space-around;gap:14px}
+  .round-label{
+    font-family:'Archivo',sans-serif;font-stretch:112%;
+    font-size:10px;font-weight:700;letter-spacing:.22em;
+    text-transform:uppercase;color:var(--chalk-dim);
+    text-align:center;margin-bottom:6px;
+    position:sticky;top:0;
+  }
+
+  /* ---------- match card ---------- */
+  .match{
+    background:var(--pitch-1);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:8px 10px;
+    position:relative;
+  }
+  .match.norge{border-color:var(--norge);box-shadow:0 0 0 1px var(--norge),0 0 18px -6px var(--norge)}
+  .match .meta{
+    display:flex;justify-content:space-between;align-items:center;
+    font-size:10.5px;color:var(--chalk-dim);margin-bottom:5px;
+    letter-spacing:.04em;
+  }
+  .badge-live{
+    color:var(--live);font-weight:700;display:flex;align-items:center;gap:5px;
+  }
+  .badge-live::before{
+    content:"";width:7px;height:7px;border-radius:50%;
+    background:var(--live);animation:pulse 1.2s infinite;
+  }
+  .team{
+    display:flex;align-items:center;gap:7px;
+    padding:3px 0;font-size:13.5px;font-weight:500;
+  }
+  .team .flag{font-size:16px;width:20px;text-align:center;flex:none}
+  .team .name{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .team .score{
+    font-family:'Archivo',sans-serif;font-stretch:110%;
+    font-weight:800;font-size:14px;min-width:16px;text-align:right;
+  }
+  .team.winner{color:#fff}
+  .team.winner .score{color:var(--grass)}
+  .team.winner .name{font-weight:700}
+  .team.loser{opacity:.42}
+  .team.loser .name{text-decoration:line-through;text-decoration-color:rgba(233,242,236,.4);text-decoration-thickness:1px}
+  .team.tbd{color:var(--chalk-dim);font-style:italic;font-size:12.5px}
+  .pens{
+    font-size:10.5px;color:var(--chalk-dim);margin-top:3px;
+  }
+
+  /* ---------- final card ---------- */
+  .final-wrap{display:flex;flex-direction:column;justify-content:center;align-items:center;gap:10px}
+  .trophy{font-size:44px;filter:drop-shadow(0 4px 14px rgba(232,179,60,.45))}
+  .final-title{
+    font-family:'Archivo',sans-serif;font-stretch:120%;font-weight:900;
+    font-size:20px;color:var(--gold);letter-spacing:.06em;text-transform:uppercase;
+  }
+  .match.final{
+    border-color:var(--gold);
+    background:linear-gradient(160deg,#1c1706 0%, var(--pitch-1) 70%);
+    box-shadow:0 0 0 1px rgba(232,179,60,.35), 0 8px 30px -10px rgba(232,179,60,.35);
+    width:100%;
+  }
+  footer{
+    text-align:center;font-size:11.5px;color:var(--chalk-dim);
+    padding:0 16px 34px;line-height:1.6;
+  }
+  @media (max-width:700px){
+    .scroller{padding:14px 8px 30px}
+    .hint{display:block;text-align:center;font-size:11px;color:var(--chalk-dim);margin-top:8px}
+  }
+  .hint{display:none}
+</style>
 </head>
 <body>
-    <div class="container">
-        <h1>Revenue Calculator</h1>
-        
-        <div class="input-group">
-            <label>Revenue (NOK):</label>
-            <input type="number" id="clinicRevenue" value="0" step="50000" min="0">
-        </div>
-        
-        <div class="input-group">
-            <label>Provision Rate (%):</label>
-            <input type="number" id="provisionRate" value="0" step="1" min="0" max="100">
-        </div>
 
-        <div id="results">
-            <h3>Calculation Summary:</h3>
-            <div id="earningsText"></div>
-        </div>
+<header>
+  <div class="eyebrow">FIFA World Cup · USA · Mexico · Canada</div>
+  <h1>Sluttspilltreet <span class="yr">VM 2026</span></h1>
+  <div class="updated" id="updated"></div>
+  <div class="legend">
+    <span><i class="dot w"></i> Videre</span>
+    <span><i class="dot u"></i> Kommende kamp</span>
+    <span><i class="dot l"></i> Live</span>
+    <span><i class="dot n"></i> Norges vei</span>
+  </div>
+  <div class="hint">← Sveip sidelengs for hele treet →</div>
+</header>
 
-        <div class="chart-container">
-            <canvas id="earningsChart"></canvas>
-        </div>
-    </div>
+<div class="scroller">
+  <div class="bracket" id="bracket"></div>
+</div>
 
-    <script>
-        // Wait for the page to fully load
-        window.addEventListener('load', function() {
-            let myChart = null;
+<footer>
+  Alle tider er norsk tid. Resultater hentes automatisk fra ESPN hvert minutt.<br>
+  Hvis hentingen feiler, vises de innebygde resultatene i <code>DATA</code>-objektet i stedet.
+</footer>
 
-            function formatNOK(value) {
-                return new Intl.NumberFormat('no-NO', {
-                    style: 'currency',
-                    currency: 'NOK',
-                    maximumFractionDigits: 0
-                }).format(value);
-            }
+<script>
+/* =====================================================================
+   ALT DU TRENGER Å OPPDATERE LIGGER HER.
+   status: "played" | "live" | "upcoming"
+   score: [hjemme, borte]  (etter ev. ekstraomganger)
+   pens:  [hjemme, borte]  eller null
+   Vinnere regnes ut automatisk og settes inn i neste runde.
+   ===================================================================== */
+const LAST_UPDATED = "4. juli 2026, kl. 17:00";
 
-            function updateCalculator() {
-                const clinicRevenue = parseFloat(document.getElementById('clinicRevenue').value) || 0;
-                const provisionRate = parseFloat(document.getElementById('provisionRate').value) || 0;
-                
-                const earnings = (clinicRevenue * provisionRate) / 100;
-                
-                // Update results text
-                document.getElementById('earningsText').innerHTML = `
-                    <p>With revenue of ${formatNOK(clinicRevenue)} and ${provisionRate}% provision rate:</p>
-                    <p class="earnings">Result: ${formatNOK(earnings)}</p>
-                `;
-                
-                // Generate data points with 50,000 NOK intervals
-                const step = 50000;
-                const maxRevenue = Math.max(400000, Math.ceil(clinicRevenue * 2 / step) * step);
-                const dataPoints = [];
-                
-                for (let revenue = 0; revenue <= maxRevenue; revenue += step) {
-                    dataPoints.push({
-                        x: revenue,
-                        y: (revenue * provisionRate) / 100
-                    });
-                }
+const TEAMS = {
+  GER:{n:"Tyskland",f:"🇩🇪"}, PAR:{n:"Paraguay",f:"🇵🇾"},
+  FRA:{n:"Frankrike",f:"🇫🇷"}, SWE:{n:"Sverige",f:"🇸🇪"},
+  RSA:{n:"Sør-Afrika",f:"🇿🇦"}, CAN:{n:"Canada",f:"🇨🇦"},
+  NED:{n:"Nederland",f:"🇳🇱"}, MAR:{n:"Marokko",f:"🇲🇦"},
+  POR:{n:"Portugal",f:"🇵🇹"}, CRO:{n:"Kroatia",f:"🇭🇷"},
+  ESP:{n:"Spania",f:"🇪🇸"}, AUT:{n:"Østerrike",f:"🇦🇹"},
+  USA:{n:"USA",f:"🇺🇸"}, BIH:{n:"Bosnia-Herc.",f:"🇧🇦"},
+  BEL:{n:"Belgia",f:"🇧🇪"}, SEN:{n:"Senegal",f:"🇸🇳"},
+  BRA:{n:"Brasil",f:"🇧🇷"}, JPN:{n:"Japan",f:"🇯🇵"},
+  CIV:{n:"Elfenbenskysten",f:"🇨🇮"}, NOR:{n:"Norge",f:"🇳🇴"},
+  MEX:{n:"Mexico",f:"🇲🇽"}, ECU:{n:"Ecuador",f:"🇪🇨"},
+  ENG:{n:"England",f:"🏴󠁧󠁢󠁥󠁮󠁧󠁿"}, COD:{n:"DR Kongo",f:"🇨🇩"},
+  ARG:{n:"Argentina",f:"🇦🇷"}, CPV:{n:"Kapp Verde",f:"🇨🇻"},
+  AUS:{n:"Australia",f:"🇦🇺"}, EGY:{n:"Egypt",f:"🇪🇬"},
+  SUI:{n:"Sveits",f:"🇨🇭"}, ALG:{n:"Algerie",f:"🇩🇿"},
+  COL:{n:"Colombia",f:"🇨🇴"}, GHA:{n:"Ghana",f:"🇬🇭"}
+};
 
-                // Calculate suggested ticks for y-axis
-                const maxY = (maxRevenue * provisionRate) / 100;
-                const yStep = 20000;
-                const yTicks = [];
-                for (let y = 0; y <= maxY; y += yStep) {
-                    yTicks.push(y);
-                }
-                
-                // Destroy existing chart if it exists
-                if (myChart) {
-                    myChart.destroy();
-                }
-                
-                // Create new chart
-                const ctx = document.getElementById('earningsChart').getContext('2d');
-                myChart = new Chart(ctx, {
-                    type: 'scatter',
-                    data: {
-                        datasets: [{
-                            label: 'Result',
-                            data: dataPoints,
-                            borderColor: '#2563eb',
-                            backgroundColor: 'rgba(37, 99, 235, 0.1)',
-                            fill: true,
-                            tension: 0.1,
-                            pointRadius: 4,
-                            pointHoverRadius: 6,
-                            showLine: true
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        interaction: {
-                            intersect: false,
-                            mode: 'index'
-                        },
-                        scales: {
-                            x: {
-                                type: 'linear',
-                                title: {
-                                    display: true,
-                                    text: 'Revenue (NOK)',
-                                    font: {
-                                        size: 14,
-                                        weight: 'bold'
-                                    }
-                                },
-                                ticks: {
-                                    callback: function(value) {
-                                        return formatNOK(value);
-                                    },
-                                    stepSize: 50000,
-                                    autoSkip: false
-                                },
-                                min: 0,
-                                max: maxRevenue,
-                                grid: {
-                                    display: true
-                                }
-                            },
-                            y: {
-                                type: 'linear',
-                                title: {
-                                    display: true,
-                                    text: 'Result (NOK)',
-                                    font: {
-                                        size: 14,
-                                        weight: 'bold'
-                                    }
-                                },
-                                ticks: {
-                                    callback: function(value) {
-                                        return formatNOK(value);
-                                    },
-                                    stepSize: 20000,
-                                    autoSkip: false,
-                                    values: yTicks
-                                },
-                                min: 0,
-                                max: maxY,
-                                grid: {
-                                    display: true
-                                }
-                            }
-                        },
-                        plugins: {
-                            tooltip: {
-                                callbacks: {
-                                    label: function(context) {
-                                        return 'Result: ' + formatNOK(context.raw.y);
-                                    },
-                                    title: function(context) {
-                                        return 'Revenue: ' + formatNOK(context[0].raw.x);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                });
-            }
+const DATA = {
+  /* ---------------- 16-delsfinaler (Round of 32) ---------------- */
+  m1:{home:"GER",away:"PAR",date:"29.6.",status:"played",score:[1,1],pens:[3,4]},
+  m2:{home:"FRA",away:"SWE",date:"30.6.",status:"played",score:[3,0],pens:null},
+  m3:{home:"RSA",away:"CAN",date:"28.6.",status:"played",score:[0,1],pens:null},
+  m4:{home:"NED",away:"MAR",date:"30.6.",status:"played",score:[1,1],pens:[2,3]},
+  m5:{home:"POR",away:"CRO",date:"2.7.",status:"played",score:[2,1],pens:null},
+  m6:{home:"ESP",away:"AUT",date:"2.7.",status:"played",score:[3,0],pens:null},
+  m7:{home:"USA",away:"BIH",date:"1.7.",status:"played",score:[2,0],pens:null},
+  m8:{home:"BEL",away:"SEN",date:"1.7.",status:"played",score:[3,2],pens:null,note:"e.e.o."},
+  m9:{home:"BRA",away:"JPN",date:"29.6.",status:"played",score:[2,1],pens:null},
+  m10:{home:"CIV",away:"NOR",date:"30.6.",status:"played",score:[1,2],pens:null},
+  m11:{home:"MEX",away:"ECU",date:"30.6.",status:"played",score:[2,0],pens:null},
+  m12:{home:"ENG",away:"COD",date:"1.7.",status:"played",score:[2,1],pens:null},
+  m13:{home:"ARG",away:"CPV",date:"3.7.",status:"played",score:[3,2],pens:null,note:"e.e.o."},
+  m14:{home:"AUS",away:"EGY",date:"3.7.",status:"played",score:[1,1],pens:[2,4]},
+  m15:{home:"SUI",away:"ALG",date:"3.7.",status:"played",score:[2,0],pens:null},
+  m16:{home:"COL",away:"GHA",date:"3.7.",status:"played",score:[1,0],pens:null},
 
-            // Add event listeners
-            document.getElementById('clinicRevenue').addEventListener('input', updateCalculator);
-            document.getElementById('provisionRate').addEventListener('input', updateCalculator);
-            
-            // Initial calculation
-            updateCalculator();
-        });
-    </script>
+  /* ---------------- Åttedelsfinaler (Round of 16) ----------------
+     home/away: null = hentes automatisk fra kampene i "from"        */
+  r1:{from:["m3","m4"],date:"4.7. kl. 19:00",status:"upcoming",score:null,pens:null},
+  r2:{from:["m1","m2"],date:"4.7. kl. 23:00",status:"upcoming",score:null,pens:null},
+  r3:{from:["m5","m6"],date:"6.7. kl. 21:00",status:"upcoming",score:null,pens:null},
+  r4:{from:["m7","m8"],date:"7.7. kl. 02:00",status:"upcoming",score:null,pens:null},
+  r5:{from:["m9","m10"],date:"5.7. kl. 22:00",status:"upcoming",score:null,pens:null},
+  r6:{from:["m11","m12"],date:"6.7. kl. 02:00",status:"upcoming",score:null,pens:null},
+  r7:{from:["m13","m14"],date:"7.7. kl. 18:00",status:"upcoming",score:null,pens:null},
+  r8:{from:["m15","m16"],date:"7.7. kl. 22:00",status:"upcoming",score:null,pens:null},
+
+  /* ---------------- Kvartfinaler ---------------- */
+  q1:{from:["r1","r2"],date:"9.7.",status:"upcoming",score:null,pens:null},
+  q2:{from:["r3","r4"],date:"10.7.",status:"upcoming",score:null,pens:null},
+  q3:{from:["r5","r6"],date:"11.7.",status:"upcoming",score:null,pens:null},
+  q4:{from:["r7","r8"],date:"12.7.",status:"upcoming",score:null,pens:null},
+
+  /* ---------------- Semifinaler ---------------- */
+  s1:{from:["q1","q2"],date:"14.7.",status:"upcoming",score:null,pens:null},
+  s2:{from:["q3","q4"],date:"15.7.",status:"upcoming",score:null,pens:null},
+
+  /* ---------------- Finale ---------------- */
+  f1:{from:["s1","s2"],date:"19.7.",status:"upcoming",score:null,pens:null}
+};
+
+/* ===================== motoren – trenger ikke røres ===================== */
+function winnerOf(id){
+  const m = DATA[id];
+  if(!m || m.status !== "played" || !m.score) return null;
+  const [h,a] = m.score;
+  if(h > a) return resolveTeam(m,"home");
+  if(a > h) return resolveTeam(m,"away");
+  if(m.pens) return m.pens[0] > m.pens[1] ? resolveTeam(m,"home") : resolveTeam(m,"away");
+  return null;
+}
+function resolveTeam(m, side){
+  if(m[side]) return m[side];
+  if(m.from){
+    const idx = side === "home" ? 0 : 1;
+    return winnerOf(m.from[idx]);
+  }
+  return null;
+}
+function placeholder(m, side){
+  if(!m.from) return "–";
+  const srcId = m.from[side === "home" ? 0 : 1];
+  const src = DATA[srcId];
+  const h = resolveTeam(src,"home"), a = resolveTeam(src,"away");
+  const nm = c => c ? TEAMS[c].n : "?";
+  return "Vinner " + nm(h) + "/" + nm(a);
+}
+
+function teamRow(m, side){
+  const code = resolveTeam(m, side);
+  const idx = side === "home" ? 0 : 1;
+  if(!code){
+    return `<div class="team tbd"><span class="flag">·</span><span class="name">${placeholder(m,side)}</span></div>`;
+  }
+  const t = TEAMS[code];
+  let cls = "team", scoreHtml = "";
+  if(m.status === "played" && m.score){
+    const win = winnerOf(getId(m)) === code;
+    cls += win ? " winner" : " loser";
+    let s = m.score[idx];
+    if(m.pens) s += ` (${m.pens[idx]})`;
+    scoreHtml = `<span class="score">${s}</span>`;
+  } else if(m.status === "live" && m.score){
+    scoreHtml = `<span class="score">${m.score[idx]}</span>`;
+  }
+  return `<div class="${cls}"><span class="flag">${t.f}</span><span class="name">${t.n}</span>${scoreHtml}</div>`;
+}
+
+const idCache = new Map();
+function getId(m){
+  if(idCache.size === 0) Object.entries(DATA).forEach(([k,v]) => idCache.set(v,k));
+  return idCache.get(m);
+}
+
+function matchCard(id, isFinal){
+  const m = DATA[id];
+  const h = resolveTeam(m,"home"), a = resolveTeam(m,"away");
+  const hasNorway = h === "NOR" || a === "NOR";
+  let meta;
+  if(m.status === "live") meta = `<span class="badge-live">LIVE ${m.clock || ""}</span><span>${m.date}</span>`;
+  else if(m.status === "played") meta = `<span>Sluttresultat</span><span>${m.date}</span>`;
+  else meta = `<span>Kommende</span><span>${m.date}</span>`;
+  let extra = "";
+  if(m.pens) extra = `<div class="pens">Straffer ${m.pens[0]}–${m.pens[1]}</div>`;
+  else if(m.note) extra = `<div class="pens">Avgjort ${m.note}</div>`;
+  return `<div class="match${hasNorway ? " norge":""}${isFinal ? " final":""}">
+    <div class="meta">${meta}</div>
+    ${teamRow(m,"home")}
+    ${teamRow(m,"away")}
+    ${extra}
+  </div>`;
+}
+
+function col(label, ids){
+  return `<div class="col"><div>
+    <div class="round-label">${label}</div>
+    ${ids.map(id => matchCard(id,false)).join("")}
+  </div></div>`;
+}
+
+function render(){
+  document.getElementById("bracket").innerHTML =
+    col("16-delsfinaler", ["m1","m2","m3","m4","m5","m6","m7","m8"]) +
+    col("Åttedelsfinaler", ["r1","r2","r3","r4"]) +
+    col("Kvartfinaler", ["q1","q2"]) +
+    col("Semifinale", ["s1"]) +
+    `<div class="col"><div class="final-wrap">
+        <div class="trophy">🏆</div>
+        <div class="final-title">Finale</div>
+        ${matchCard("f1", true)}
+     </div></div>` +
+    col("Semifinale", ["s2"]) +
+    col("Kvartfinaler", ["q3","q4"]) +
+    col("Åttedelsfinaler", ["r5","r6","r7","r8"]) +
+    col("16-delsfinaler", ["m9","m10","m11","m12","m13","m14","m15","m16"]);
+}
+
+render();
+document.getElementById("updated").textContent = "Sist oppdatert: " + LAST_UPDATED;
+
+/* ===================== LIVE-OPPDATERING (ESPN) =====================
+   Henter sluttspillkamper fra ESPNs åpne resultat-API og fletter dem
+   inn i DATA. Kjøres ved lasting og deretter hvert 60. sekund.
+   Feiler hentingen (offline, API endret), beholdes innebygde data.
+   =================================================================== */
+const ESPN_URL = "https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard?dates=20260628-20260719&limit=200";
+
+/* ESPN bruker stort sett FIFA-koder, men noen varianter forekommer */
+const ABBR_ALIAS = { NLD:"NED", HOL:"NED", CGO:"COD", CBV:"CPV", CVI:"CPV",
+                     SAF:"RSA", IVC:"CIV", BOS:"BIH", SWI:"SUI", ALGE:"ALG" };
+const normAbbr = s => { s = (s||"").toUpperCase(); return ABBR_ALIAS[s] || s; };
+
+async function syncLive(){
+  try{
+    const res = await fetch(ESPN_URL);
+    if(!res.ok) throw new Error(res.status);
+    const json = await res.json();
+
+    (json.events || []).forEach(ev => {
+      const comp = ev.competitions && ev.competitions[0];
+      if(!comp || !comp.competitors || comp.competitors.length !== 2) return;
+      const cs = comp.competitors;
+      const codes = cs.map(x => normAbbr(x.team && x.team.abbreviation));
+
+      /* finn kampen i DATA med samme lagpar (rekkefølge-uavhengig) */
+      for(const [id, m] of Object.entries(DATA)){
+        const h = resolveTeam(m,"home"), a = resolveTeam(m,"away");
+        if(!h || !a) continue;
+        const samePair = (codes[0] === h && codes[1] === a) ||
+                         (codes[0] === a && codes[1] === h);
+        if(!samePair) continue;
+
+        const state = ev.status && ev.status.type && ev.status.type.state; // pre | in | post
+        if(state === "in" || state === "post"){
+          const hc = cs.find(x => normAbbr(x.team.abbreviation) === h);
+          const ac = cs.find(x => normAbbr(x.team.abbreviation) === a);
+          m.score = [ +hc.score || 0, +ac.score || 0 ];
+          if(hc.shootoutScore != null || ac.shootoutScore != null){
+            m.pens = [ +hc.shootoutScore || 0, +ac.shootoutScore || 0 ];
+          }
+          m.status = state === "in" ? "live" : "played";
+          m.clock  = state === "in" ? (ev.status.displayClock || "") : null;
+        }
+        break;
+      }
+    });
+
+    render();
+    document.getElementById("updated").textContent =
+      "Sist oppdatert: " + new Date().toLocaleTimeString("no-NO",
+        {hour:"2-digit", minute:"2-digit"}) + " · live fra ESPN";
+  }catch(e){
+    /* stille fallback – innebygde resultater vises fortsatt */
+    console.warn("Live-oppdatering feilet:", e);
+  }
+}
+
+syncLive();
+setInterval(syncLive, 60000);
+document.addEventListener("visibilitychange", () => {
+  if(!document.hidden) syncLive();
+});
+</script>
 </body>
 </html>
