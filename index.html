@@ -116,6 +116,12 @@
     font-family:'Archivo',sans-serif;font-stretch:120%;font-weight:900;
     font-size:20px;color:var(--gold);letter-spacing:.06em;text-transform:uppercase;
   }
+  .bronze-title{
+    font-family:'Archivo',sans-serif;font-stretch:115%;font-weight:800;
+    font-size:12px;color:#b07a3a;letter-spacing:.14em;text-transform:uppercase;
+    margin-top:14px;
+  }
+  .final-wrap .match:not(.final){width:100%}
   .match.final{
     border-color:var(--gold);
     background:linear-gradient(160deg,#1c1706 0%, var(--pitch-1) 70%);
@@ -146,6 +152,7 @@
     .match.norge{box-shadow:0 0 0 1px var(--norge)}
     .trophy{font-size:24px}
     .final-title{font-size:9px;letter-spacing:.04em}
+    .bronze-title{font-size:8px;letter-spacing:.04em;margin-top:8px}
     .match.final{padding:4px 2px}
   }
 
@@ -301,24 +308,25 @@ const DATA = {
   m15:{home:"SUI",away:"ALG",date:"3.7.",status:"played",score:[2,0],pens:null},
   m16:{home:"COL",away:"GHA",date:"3.7.",status:"played",score:[1,0],pens:null},
 
-  r1:{from:["m3","m4"],date:"4.7.",time:"19:00",status:"upcoming",score:null,pens:null},
-  r2:{from:["m1","m2"],date:"4.7.",time:"23:00",status:"upcoming",score:null,pens:null},
-  r3:{from:["m5","m6"],date:"6.7.",time:"21:00",status:"upcoming",score:null,pens:null},
-  r4:{from:["m7","m8"],date:"7.7.",time:"02:00",status:"upcoming",score:null,pens:null},
-  r5:{from:["m9","m10"],date:"5.7.",time:"22:00",status:"upcoming",score:null,pens:null},
-  r6:{from:["m11","m12"],date:"6.7.",time:"02:00",status:"upcoming",score:null,pens:null},
+  r1:{from:["m3","m4"],date:"4.7.",time:"19:00",status:"played",score:[0,3],pens:null},
+  r2:{from:["m1","m2"],date:"4.7.",time:"23:00",status:"played",score:[0,1],pens:null},
+  r3:{from:["m5","m6"],date:"6.7.",time:"21:00",status:"played",score:[0,1],pens:null},
+  r4:{from:["m7","m8"],date:"7.7.",time:"02:00",status:"played",score:[1,4],pens:null},
+  r5:{from:["m9","m10"],date:"5.7.",time:"22:00",status:"played",score:[0,2],pens:null},
+  r6:{from:["m11","m12"],date:"6.7.",time:"02:00",status:"played",score:[2,3],pens:null},
   r7:{from:["m13","m14"],date:"7.7.",time:"18:00",status:"upcoming",score:null,pens:null},
   r8:{from:["m15","m16"],date:"7.7.",time:"22:00",status:"upcoming",score:null,pens:null},
 
-  q1:{from:["r1","r2"],date:"9.7.",status:"upcoming",score:null,pens:null},
-  q2:{from:["r3","r4"],date:"10.7.",status:"upcoming",score:null,pens:null},
-  q3:{from:["r5","r6"],date:"11.7.",status:"upcoming",score:null,pens:null},
-  q4:{from:["r7","r8"],date:"12.7.",status:"upcoming",score:null,pens:null},
+  q1:{from:["r1","r2"],date:"9.7.",time:"22:00",status:"upcoming",score:null,pens:null},
+  q2:{from:["r3","r4"],date:"10.7.",time:"21:00",status:"upcoming",score:null,pens:null},
+  q3:{from:["r5","r6"],date:"11.7.",time:"23:00",status:"upcoming",score:null,pens:null},
+  q4:{from:["r7","r8"],date:"12.7.",time:"03:00",status:"upcoming",score:null,pens:null},
 
-  s1:{from:["q1","q2"],date:"14.7.",status:"upcoming",score:null,pens:null},
-  s2:{from:["q3","q4"],date:"15.7.",status:"upcoming",score:null,pens:null},
+  s1:{from:["q1","q2"],date:"14.7.",time:"21:00",status:"upcoming",score:null,pens:null},
+  s2:{from:["q3","q4"],date:"15.7.",time:"21:00",status:"upcoming",score:null,pens:null},
 
-  f1:{from:["s1","s2"],date:"19.7.",status:"upcoming",score:null,pens:null}
+  b1:{fromLosers:["s1","s2"],date:"18.7.",time:"23:00",status:"upcoming",score:null,pens:null},
+  f1:{from:["s1","s2"],date:"19.7.",time:"21:00",status:"upcoming",score:null,pens:null}
 };
 
 const ROUNDS = [
@@ -326,6 +334,7 @@ const ROUNDS = [
   {key:"r16", tab:"8-dels", label:"Åttedelsfinaler", ids:["r1","r2","r5","r6","r3","r4","r7","r8"]},
   {key:"qf",  tab:"Kvartfinale", label:"Kvartfinaler", ids:["q1","q2","q3","q4"]},
   {key:"sf",  tab:"Semifinale", label:"Semifinaler", ids:["s1","s2"]},
+  {key:"b",   tab:"Bronse", label:"Bronsefinale", ids:["b1"]},
   {key:"f",   tab:"Finale", label:"Finale", ids:["f1"]}
 ];
 
@@ -339,21 +348,29 @@ function winnerOf(id){
   if(m.pens) return m.pens[0] > m.pens[1] ? resolveTeam(m,"home") : resolveTeam(m,"away");
   return null;
 }
+function loserOf(id){
+  const m = DATA[id];
+  if(!m || m.status !== "played" || !m.score) return null;
+  const w = winnerOf(id);
+  if(!w) return null;
+  const h = resolveTeam(m,"home"), a = resolveTeam(m,"away");
+  return w === h ? a : h;
+}
 function resolveTeam(m, side){
   if(m[side]) return m[side];
-  if(m.from){
-    const idx = side === "home" ? 0 : 1;
-    return winnerOf(m.from[idx]);
-  }
+  const idx = side === "home" ? 0 : 1;
+  if(m.from) return winnerOf(m.from[idx]);
+  if(m.fromLosers) return loserOf(m.fromLosers[idx]);
   return null;
 }
 function placeholder(m, side){
-  if(!m.from) return "–";
-  const srcId = m.from[side === "home" ? 0 : 1];
+  const srcArr = m.from || m.fromLosers;
+  if(!srcArr) return "–";
+  const srcId = srcArr[side === "home" ? 0 : 1];
   const src = DATA[srcId];
   const h = resolveTeam(src,"home"), a = resolveTeam(src,"away");
   const nm = c => c ? TEAMS[c].n : "?";
-  return "Vinner " + nm(h) + "/" + nm(a);
+  return (m.fromLosers ? "Taper " : "Vinner ") + nm(h) + "/" + nm(a);
 }
 const idCache = new Map();
 function getId(m){
@@ -423,6 +440,8 @@ function renderBracket(){
         <div class="trophy">🏆</div>
         <div class="final-title">Finale</div>
         ${matchCard("f1", true)}
+        <div class="bronze-title">Bronse</div>
+        ${matchCard("b1", false)}
      </div></div>` +
     col("Semifinale", ["s2"]) +
     col("Kvartfinaler", ["q3","q4"]) +
